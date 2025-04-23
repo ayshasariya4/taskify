@@ -25,10 +25,27 @@ def delete_task(id):
 
 @app.route('/complete/<int:id>')
 def complete_task(id):
-    # Send PUT request to FastAPI backend to update the task's status
-    response = requests.put(f'http://127.0.0.1:8000/tasks/{id}', json={'status': 'Completed'})
-    print(response.json())  # This will print the response for debugging
+    # Fetch the task details from FastAPI before updating
+    tasks = requests.get('http://127.0.0.1:8000/tasks').json()
+    
+    # Get the task you want to update
+    task = tasks[id]
+    
+    # Create the updated task data (full task with status)
+    updated_task = {
+        'title': task['title'],
+        'description': task['description'],
+        'status': 'Completed'  # Changing only the status
+    }
+
+    # Send the PUT request to FastAPI with the updated task
+    response = requests.put(f'http://127.0.0.1:8000/tasks/{id}', json=updated_task)
+    
+    # Print the response from FastAPI for debugging
+    print(response.json())  # This will print the FastAPI response in the terminal for debugging
+    
     return redirect('/')
+
 
 
 if __name__ == "__main__":
