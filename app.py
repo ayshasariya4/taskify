@@ -3,50 +3,37 @@ import requests
 
 app = Flask(__name__)
 
-# Frontend route to display tasks
+FASTAPI_URL = 'http://127.0.0.1:8000'
+
 @app.route('/')
 def index():
-    tasks = requests.get('http://127.0.0.1:8000/tasks').json()  # Fetch tasks from FastAPI
+    tasks = requests.get(f'{FASTAPI_URL}/tasks').json()
     return render_template('index.html', tasks=tasks)
 
-# Frontend route to add a new task
 @app.route('/add', methods=['POST'])
 def add_task():
     title = request.form['title']
     description = request.form['description']
-    requests.post('http://127.0.0.1:8000/tasks', json={'title': title, 'description': description})
+    requests.post(f'{FASTAPI_URL}/tasks', json={'title': title, 'description': description})
     return redirect('/')
 
-# Frontend route to delete a task
 @app.route('/delete/<int:id>')
 def delete_task(id):
-    requests.delete(f'http://127.0.0.1:8000/tasks/{id}')
+    requests.delete(f'{FASTAPI_URL}/tasks/{id}')
     return redirect('/')
 
 @app.route('/complete/<int:id>')
 def complete_task(id):
-    # Fetch the task details from FastAPI before updating
-    tasks = requests.get('http://127.0.0.1:8000/tasks').json()
-    
-    # Get the task you want to update
-    task = tasks[id]
-    
-    # Create the updated task data (full task with status)
-    updated_task = {
-        'title': task['title'],
-        'description': task['description'],
-        'status': 'Completed'  # Changing only the status
-    }
-
-    # Send the PUT request to FastAPI with the updated task
-    response = requests.put(f'http://127.0.0.1:8000/tasks/{id}', json=updated_task)
-    
-    # Print the response from FastAPI for debugging
-    print(response.json())  # This will print the FastAPI response in the terminal for debugging
-    
+    tasks = requests.get(f'{FASTAPI_URL}/tasks').json()
+    task = next((t for t in tasks if t['id'] == id), None)
+    if task:
+        updated_task = {
+            'title': task['title'],
+            'description': task['description'],
+            'status': 'Completed'
+        }
+        requests.put(f'{FASTAPI_URL}/tasks/{id}', json=updated_task)
     return redirect('/')
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)
