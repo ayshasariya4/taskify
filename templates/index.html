@@ -2,29 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taskify</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Task List</h1>
-    <form action="/add" method="POST">
-        <input type="text" name="title" placeholder="Task Title" required><br>
-        <textarea name="description" placeholder="Task Description" required></textarea><br>
-        <button type="submit">Add Task</button>
-    </form>
+<body class="bg-gray-100 text-gray-800 font-sans">
 
-    <ul>
-        {% for task in tasks %}
-            <li>
-                <strong>{{ task['title'] }}</strong> - 
-                <span {% if task['status'] == 'Completed' %}style="text-decoration: line-through;"{% endif %}>
-                    {{ task['status'] }}
-                </span>
-                {% if task['status'] == 'In-progress' %}
-                    <a href="/complete/{{ task['id'] }}">Complete</a>
-                {% endif %}
-                <a href="/delete/{{ task['id'] }}">Delete</a>
+    <div class="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
+        <h1 class="text-3xl font-semibold text-center text-blue-600 mb-6">Task List</h1>
+        
+        <form action="/add" method="POST" class="space-y-4">
+            <div>
+                <input type="text" name="title" placeholder="Task Title" required class="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+                <textarea name="description" placeholder="Task Description" required class="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4"></textarea>
+            </div>
+            <button type="submit" class="w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition">Add Task</button>
+        </form>
+
+        <ul class="mt-8 space-y-4">
+            {% for task in tasks %}
+            <li class="flex items-center justify-between p-4 border-b rounded-md hover:bg-gray-50">
+                <div class="flex items-center space-x-4">
+                    <strong class="text-xl text-gray-800">{{ task['title'] }}</strong> 
+                    <span class="text-gray-600">{{ task['description'] }}</span>
+                </div>
+                <div class="space-x-3">
+                    <span class="px-2 py-1 text-xs font-semibold rounded-md 
+                        {% if task['status'] == 'Completed' %}
+                            bg-green-200 text-green-700
+                        {% else %}
+                            bg-yellow-200 text-yellow-700
+                        {% endif %}
+                    ">{{ task['status'] }}</span>
+                    {% if task['status'] == 'In-progress' %}
+                        <a href="/complete/{{ task['id'] }}" class="text-blue-500 hover:underline text-sm">Complete</a>
+                    {% endif %}
+                    <a href="/delete/{{ task['id'] }}" class="text-red-500 hover:underline text-sm">Delete</a>
+                </div>
             </li>
-        {% endfor %}
-    </ul>
+            {% endfor %}
+        </ul>
+    </div>
+
 </body>
 </html>
